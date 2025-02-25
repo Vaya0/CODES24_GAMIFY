@@ -1,7 +1,7 @@
 
 #include <iostream>
 #include <fstream>
-#include <cstring>  // For C-string functions
+#include <cstring>  
 #include <sstream>
 #include <Windows.h>
 #include <thread>
@@ -10,31 +10,24 @@
 
 class FileManager {
 private:
-    static constexpr int MAX_FILES = 100; // Maximum number of files
-    char  filenames[MAX_FILES][255] = {}; // Assuming maximum filename length of 255 characters
+    static constexpr int MAX_FILES = 100; 
+    char  filenames[MAX_FILES][255] = {}; 
     int numFiles = 0;
 
 public:
-    // Function to create a file
     void createFile(const char* filename);
 
-    // Function to find a file by name
     int findFile(const char* filename);
 
-    // Function to read from a file
     void readFile(const char* filename);
 
-    // Function to write to a file
     void writeFile(const char* filename);
 
-    // Function to delete a file
     void deleteFile(const char* filename);
-
-    // Function for file management interface
+l
     void interface1();
 };
 
-// Function to create a file
 void FileManager::createFile(const char* filename) {
     if (numFiles < MAX_FILES) {
         std::ofstream file(filename);
@@ -52,7 +45,6 @@ void FileManager::createFile(const char* filename) {
     }
 }
 
-// Function to find a file by name
 int FileManager::findFile(const char* filename) {
     for (int i = 0; i < numFiles; ++i) {
         if (std::strcmp(filenames[i], filename) == 0) {
@@ -71,29 +63,25 @@ size_t getFileSize(std::ifstream& f) {
     return size;
 }
 
-// Function to read from a file
 void FileManager::readFile(const char* filename) {
-    std::ifstream file(filename, std::ios::binary); // Open in binary mode
+    std::ifstream file(filename, std::ios::binary); 
     if (!file.is_open()) {
         std::cerr << "Unable to open file: " << filename << std::endl;
         return;
     }
 
-    // Get the file size
     size_t fileSize = getFileSize(file);
 
     char* buffer = new char[fileSize];
     file.read(buffer, fileSize);
     file.close();
 
-    // Output the contents of the buffer
     std::cout << "Content of '" << filename << "':\n";
     std::cout.write(buffer, fileSize);
 
     delete[] buffer;
 }
 
-// Function to write to a file
 void FileManager::writeFile(const char* filename) {
     std::ofstream file(filename, std::ios_base::app);
     if (!file.is_open()) {
@@ -105,18 +93,16 @@ void FileManager::writeFile(const char* filename) {
         while (true) {
             std::getline(std::cin, line);
             if (line == "DONE") {
-                break;  // Exit the loop if 'done' is entered
+                break;  
             }
-            file << line << std::endl; // Write each line to the file
+            file << line << std::endl; 
         }
         file.close();
         std::cout << "Content written to file '" << filename << "' successfully." << std::endl;
     }
 }
 
-// Function to delete a file
 void FileManager::deleteFile(const char* filename) {
-    // Check if the file exists before attempting deletion
     std::ifstream file(filename);
     if (!file.is_open()) {
         std::cerr << "File '" << filename << "' does not exist." << std::endl;
@@ -126,7 +112,6 @@ void FileManager::deleteFile(const char* filename) {
     remove(filename);
     int index = findFile(filename);
     if (index != -1) {
-        // Remove the filename from the array of filenames
         for (int i = index; i < numFiles - 1; ++i) {
             strcpy_s(filenames[i], 255, filenames[i + 1]);
         }
@@ -140,43 +125,32 @@ void FileManager::deleteFile(const char* filename) {
 
 
 DWORD WINAPI SecondConsoleThread(LPVOID lpParam) {
-    // Allocate a new console for this thread
     AllocConsole();
 
-    // Set the title of the new console window
     SetConsoleTitle(L"Second Console");
-
-    // Example: Print something to the new console
-    // printf("This is the second console window!\n");
  
-    // Wait for user input to close the console window
     getchar();
     
-    // Return from the thread function
     return 0;
 }
 
-// Function for file management interface
-void FileManager::interface1() {
-    // Create a new thread for the second console
+    void FileManager::interface1() {
+
     HANDLE hThread = CreateThread(NULL, 0, SecondConsoleThread, NULL, 0, NULL);
 
-    // Close the thread handle to avoid memory leaks
     CloseHandle(hThread);
 
-    // Keep the main console window open until a key is pressed
     getchar();
 
     AllocConsole();
     AttachConsole(ATTACH_PARENT_PROCESS);
 
-    // Redirect standard output and input back to the original console
     FILE* stdout_file = stdout;
     FILE* stdin_file = stdin;
     FILE* file1;
     FILE* file2;
     freopen_s(&file1, "CONOUT$", "w", stdout_file);
-    freopen_s(&file2, "CONIN$", "r", stdin_file); // Redirect input
+    freopen_s(&file2, "CONIN$", "r", stdin_file); 
    
     printf("~Choose an operation:\n");
     printf("1. Create a file\n");
@@ -219,7 +193,7 @@ void FileManager::interface1() {
         }
         case 5: {
             freopen_s(&stdout_file, "CONOUT$", "w", file1);
-            freopen_s(&stdin_file, "CONIN$", "r", file2); // Redirect input
+            freopen_s(&stdin_file, "CONIN$", "r", file2); 
             return ;
         }
         default:
@@ -243,7 +217,7 @@ int main() {
 
     FileManager fileManager;
     FreeConsole();
-    fileManager.interface1(); // Call the function to open the second console window and start the file management interface
+    fileManager.interface1(); 
     
     SetStdHandle(STD_OUTPUT_HANDLE, hOriginalStdout);
     SetStdHandle(STD_INPUT_HANDLE, hOriginalStdin);
